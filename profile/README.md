@@ -11,6 +11,7 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
 ```
  drgoulu.com (Hugo site)
  ├── Hugo Modules:
+ │   ├── backlinks4hugo  (github.com/drgoulu/backlinks4hugo)
  │   ├── altmetric4hugo  (github.com/drgoulu/altmetric4hugo)
  │   ├── openbook4hugo   (github.com/drgoulu/openbook4hugo)
  │   └── headless-cms    (github.com/drgoulu/headless-cms) [Fork of razonyang/hugo-mod-headless-cms]
@@ -22,7 +23,16 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
 
 ## 📦 Companion Modules & Forks
 
-### 1. `altmetric4hugo`
+### 1. `backlinks4hugo`
+* **Repository**: [`drgoulu/backlinks4hugo`](https://github.com/drgoulu/backlinks4hugo)
+* **Purpose**: Hugo & Hugo Blox module to index internal links and prioritize backlinks in recommended articles ("Related Content" / "Sur le même sujet").
+* **Key Features**:
+  * **Blazing-fast Go indexer**: Scans over 18,000 Markdown files and resolves canonical permalinks and aliases in under 500 ms, generating `data/backlinks.json`.
+  * **Zero Hugo build slowdown**: Consults the static index in $O(1)$ constant time inside templates, introducing no overhead to compilation.
+  * **Native Hugo Blox override**: Turnkey drop-in replacement for `layouts/_partials/page_related.html`.
+  * **Intelligent fallback**: Surfaces referencing articles first (sorted chronologically descending) and completes the 5-item list with standard taxonomy-related posts (tags & categories).
+
+### 2. `altmetric4hugo`
 * **Repository**: [`drgoulu/altmetric4hugo`](https://github.com/drgoulu/altmetric4hugo)
 * **Purpose**: Embeds dynamic [Altmetric Badges](https://www.altmetric.com/) (donuts, bars, line badges, and attention scores) in static articles and publication pages.
 * **Key Features**:
@@ -30,7 +40,7 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
   * Supports identifiers: DOIs, arXiv IDs, PubMed IDs (PMID), PubMed Central IDs (PMCID), ISBNs, URIs, Handles, and Altmetric IDs.
   * Responsive layout, customizable alignment, interactive popovers, automatic identifier reference display, and direct hyperlinks.
 
-### 2. `openbook4hugo`
+### 3. `openbook4hugo`
 * **Repository**: [`drgoulu/openbook4hugo`](https://github.com/drgoulu/openbook4hugo)
 * **Purpose**: Generates rich book data cards and citations directly from [Open Library](https://openlibrary.org/) at build time.
 * **Key Features**:
@@ -40,7 +50,7 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
 
 ---
 
-### 3. `headless-cms` (Fork)
+### 4. `headless-cms` (Fork)
 * **Repository**: [`drgoulu/headless-cms`](https://github.com/drgoulu/headless-cms)
 * **Upstream Project**: Forked from [`razonyang/hugo-mod-headless-cms`](https://github.com/razonyang/hugo-mod-headless-cms)
 * **Purpose**: Hugo module providing the admin interface and automatic CMS configuration generation for static sites.
@@ -60,7 +70,7 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
 
 ---
 
-### 4. `sveltia-cms` (Fork)
+### 5. `sveltia-cms` (Fork)
 * **Repository**: [`drgoulu/sveltia-cms`](https://github.com/drgoulu/sveltia-cms)
 * **Upstream Project**: Forked from [`sveltia/sveltia-cms`](https://github.com/sveltia/sveltia-cms)
 * **Purpose**: Lightweight, Git-based single-page application CMS built with Svelte 5.
@@ -94,10 +104,11 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
 
 ### 1. Hugo Modules (`config/_default/module.yaml`)
 
-Import the modules into your site:
+Import the modules into your site (place `backlinks4hugo` first to override the default `page_related.html` layout):
 
 ```yaml
 imports:
+  - path: github.com/drgoulu/backlinks4hugo
   - path: github.com/HugoBlox/kit/modules/integrations/netlify
   - path: github.com/HugoBlox/kit/modules/blox
   - path: github.com/drgoulu/openbook4hugo
@@ -118,13 +129,15 @@ require (
 	github.com/HugoBlox/kit/modules/blox v0.0.0-...
 	github.com/HugoBlox/kit/modules/integrations/netlify v0.0.0-...
 	github.com/drgoulu/altmetric4hugo v0.0.0-...
+	github.com/drgoulu/backlinks4hugo v0.0.0-...
 	github.com/drgoulu/headless-cms v0.0.0-...
 	github.com/drgoulu/openbook4hugo v0.0.0-...
 )
 
 replace github.com/drgoulu/altmetric4hugo => ../altmetric4hugo
-replace github.com/drgoulu/openbook4hugo => ../openbook4hugo
+replace github.com/drgoulu/backlinks4hugo => ../backlinks4hugo
 replace github.com/drgoulu/headless-cms => ../headless-cms
+replace github.com/drgoulu/openbook4hugo => ../openbook4hugo
 ```
 
 ---
