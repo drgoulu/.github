@@ -31,7 +31,7 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
   * **Static Inverted Index (`data/backlinks.json`)**: Emits a lightweight JSON index mapping target paths to arrays of referring articles (`{ "path": "...", "title": "...", "date": "..." }`).
   * **Zero Hugo Build Overhead**: By storing the link map in `data/backlinks.json`, Hugo templates query backlinks in $O(1)$ constant time via `index site.Data.backlinks $relPermalink`, avoiding costly full-graph evaluations at Hugo build time.
   * **Hugo Blox Partial Override**: Ships with `layouts/_partials/page_related.html` which automatically replaces Hugo Blox's default related posts block when imported prior to the Blox module.
-  * **Smart Sorting & Hybrid Recommendations**: Renders referring articles sorted in reverse chronological order, and seamlessly completes the 5-item recommendation list with standard taxonomy-related posts (tags & categories).
+  * **Smart Sorting & Hybrid Recommendations**: Renders referring articles sorted chronologically (`asc` by default, surfacing direct sequels and immediate follow-up articles first), and seamlessly completes the list up to the configured limit (default 5, configurable via `params.backlinks.limit`) with standard taxonomy-related posts (tags & categories).
 
 #### 🛠️ CLI Usage & Flags:
 ```bash
@@ -43,7 +43,9 @@ go run github.com/drgoulu/backlinks4hugo [OPTIONS]
 | `-content <path>` | Root directory containing Markdown content | `"content"` |
 | `-output <path>` | Path to the generated backlinks JSON file | `"data/backlinks.json"` |
 | `-domains <list>` | Comma-separated list of hostnames treated as internal links | `"drgoulu.com,www.drgoulu.com"` |
+| `-order <asc\|desc>` | Sorting order: chronological (`"asc"`, oldest first) or reverse (`"desc"`) | `"asc"` |
 | `-quiet` | Suppress non-error console output | `false` |
+
 
 #### 🔄 CI/CD & Build Pipeline Integration:
 The backlinks index can be updated as part of local development scripts or deployment pipelines (`package.json`, `publish.sh`, `netlify.toml`):
