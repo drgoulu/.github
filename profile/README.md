@@ -26,11 +26,38 @@ The site is built as a static site using [Hugo](https://gohugo.io/) and the [Hug
 ### 1. `backlinks4hugo`
 * **Repository**: [`drgoulu/backlinks4hugo`](https://github.com/drgoulu/backlinks4hugo)
 * **Purpose**: Hugo & Hugo Blox module to index internal links and prioritize backlinks in recommended articles ("Related Content" / "Sur le même sujet").
-* **Key Features**:
-  * **Blazing-fast Go indexer**: Scans over 18,000 Markdown files and resolves canonical permalinks and aliases in under 500 ms, generating `data/backlinks.json`.
-  * **Zero Hugo build slowdown**: Consults the static index in $O(1)$ constant time inside templates, introducing no overhead to compilation.
-  * **Native Hugo Blox override**: Turnkey drop-in replacement for `layouts/_partials/page_related.html`.
-  * **Intelligent fallback**: Surfaces referencing articles first (sorted chronologically descending) and completes the 5-item list with standard taxonomy-related posts (tags & categories).
+* **Key Features & Mechanics**:
+  * **High-Performance Go Indexer**: A standalone Go scanner parses frontmatter (YAML & TOML), resolves canonical permalinks and historic aliases, and extracts all internal Markdown & HTML hyperlink references across 18,000+ posts in ~450 ms.
+  * **Static Inverted Index (`data/backlinks.json`)**: Emits a lightweight JSON index mapping target paths to arrays of referring articles (`{ "path": "...", "title": "...", "date": "..." }`).
+  * **Zero Hugo Build Overhead**: By storing the link map in `data/backlinks.json`, Hugo templates query backlinks in $O(1)$ constant time via `index site.Data.backlinks $relPermalink`, avoiding costly full-graph evaluations at Hugo build time.
+  * **Hugo Blox Partial Override**: Ships with `layouts/_partials/page_related.html` which automatically replaces Hugo Blox's default related posts block when imported prior to the Blox module.
+  * **Smart Sorting & Hybrid Recommendations**: Renders referring articles sorted in reverse chronological order, and seamlessly completes the 5-item recommendation list with standard taxonomy-related posts (tags & categories).
+
+#### 🛠️ CLI Usage & Flags:
+```bash
+# Run directly via Go:
+go run github.com/drgoulu/backlinks4hugo [OPTIONS]
+```
+| Flag | Description | Default |
+| :--- | :--- | :--- |
+| `-content <path>` | Root directory containing Markdown content | `"content"` |
+| `-output <path>` | Path to the generated backlinks JSON file | `"data/backlinks.json"` |
+| `-domains <list>` | Comma-separated list of hostnames treated as internal links | `"drgoulu.com,www.drgoulu.com"` |
+| `-quiet` | Suppress non-error console output | `false` |
+
+#### 🔄 CI/CD & Build Pipeline Integration:
+The backlinks index can be updated as part of local development scripts or deployment pipelines (`package.json`, `publish.sh`, `netlify.toml`):
+```json
+{
+  "scripts": {
+    "backlinks": "go run github.com/drgoulu/backlinks4hugo",
+    "dev": "pnpm run backlinks && hugo server --disableFastRender",
+    "build": "pnpm run backlinks && hugo --gc --minify"
+  }
+}
+```
+> [!IMPORTANT]
+> In `config/_default/module.yaml`, ensure `github.com/drgoulu/backlinks4hugo` is listed **before** `github.com/HugoBlox/kit/modules/blox` so Hugo resolves the `page_related.html` partial override with priority.
 
 ### 2. `altmetric4hugo`
 * **Repository**: [`drgoulu/altmetric4hugo`](https://github.com/drgoulu/altmetric4hugo)
